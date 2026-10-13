@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-dark: #090d16;
+    --surface-dark: #111827;
+    --surface-card: #1f293d;
+    --border-dark: #2a364f;
+    --brand-teal: #0d9488;
+  }
+
+  body {
+    @apply antialiased text-slate-900 bg-slate-100 dark:bg-[#090d16] dark:text-slate-100 selection:bg-teal-500 selection:text-white;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+  }
+}
+
+/* Custom scrollbar styling for compact ERP tables */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.badge-fefo {
+  @apply bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px] font-semibold font-mono tracking-wide;
+}
+
+.badge-urgent {
+  @apply bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded text-[11px] font-semibold font-mono tracking-wide;
+}
+
+.badge-warning {
+  @apply bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[11px] font-semibold font-mono tracking-wide;
+}

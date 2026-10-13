@@ -1,0 +1,10 @@
+{
+  "name": "Remix Dhanvantari Pharmacy ERP",
+  "description": "Complete Pharmacy ERP Software for Dhanvantari Pharmacy with FEFO Billing, Barcode \u0026 Batch Scanning, AI OCR Invoice Entry, Expiry Tracking, Purchase \u0026 Stock Ledger, Reports \u0026 Analytics.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
