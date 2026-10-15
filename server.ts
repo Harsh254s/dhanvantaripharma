@@ -159,6 +159,18 @@ async function startServer() {
     res.json(db.alerts);
   });
 
+  function parseAiError(err: any, fallback: string): string {
+    if (!err) return fallback;
+    if (typeof err.message === 'string') {
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed?.error?.message) return parsed.error.message;
+      } catch {}
+      return err.message;
+    }
+    return fallback;
+  }
+
   // AI OCR Invoice Processing
   app.post("/api/ocr/extract", async (req, res) => {
     try {
@@ -167,7 +179,7 @@ async function startServer() {
       res.json(result);
     } catch (err: any) {
       console.error("OCR Extraction Error:", err);
-      res.status(500).json({ error: err.message || "AI OCR processing failed" });
+      res.status(500).json({ error: parseAiError(err, "AI OCR processing failed") });
     }
   });
 
@@ -179,7 +191,7 @@ async function startServer() {
       res.json(result);
     } catch (err: any) {
       console.error("Medicine Strip OCR Error:", err);
-      res.status(500).json({ error: err.message || "Medicine Strip OCR scanning failed" });
+      res.status(500).json({ error: parseAiError(err, "Medicine Strip OCR scanning failed") });
     }
   });
 

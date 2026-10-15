@@ -159,7 +159,13 @@ export const MedicineStripScannerModal: React.FC = () => {
       addToast(`Medicine Strip Scanned: ${result.medicineName}`, 'success');
     } catch (err: any) {
       console.error('Strip scan failed:', err);
-      const msg = err.message || 'Failed to extract legible details from medicine strip image';
+      let msg = err.message || 'Failed to extract legible details from medicine strip image';
+      try {
+        const parsed = JSON.parse(msg);
+        if (parsed?.error?.message) {
+          msg = parsed.error.message;
+        }
+      } catch {}
       setScanError(msg);
       addToast(msg, 'error');
     } finally {

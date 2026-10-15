@@ -63,9 +63,37 @@ class PharmacyDB {
     return this.aiClient;
   }
 
+  // --- AUTOMATIC MULTI-MODEL FALLBACK EXECUTOR ---
+  public async generateWithModelFallback(params: {
+    contents: any;
+    config?: any;
+  }) {
+    const ai = this.getGeminiClient();
+    // Primary: gemini-3.1-flash-lite (fastest, 1-2s response, immune to high demand queue)
+    // Secondary: gemini-3.8-flash, Tertiary: gemini-flash-latest
+    const candidates = ['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-flash-latest'];
+    let lastError: any = null;
+
+    for (const model of candidates) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents: params.contents,
+          config: params.config
+        });
+        return response;
+      } catch (err: any) {
+        console.warn(`Model ${model} encountered an issue, trying next fallback:`, err?.message || err);
+        lastError = err;
+      }
+    }
+
+    throw lastError || new Error("AI Vision engine is temporarily busy. Please try scanning again.");
+  }
+
   // --- EXPIRY ENGINE ---
   public runExpiryEngine() {
-    const today = new Date(); // 2026-07-31
+    const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
 
     this.batches.forEach(b => {
@@ -334,8 +362,7 @@ Return ONLY valid JSON with schema matching:
 
     contentsParts.push({ text: rawText ? `Invoice Text Content:\n${rawText}\n\n${promptText}` : promptText });
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
+    const response = await this.generateWithModelFallback({
       contents: { parts: contentsParts },
       config: {
         responseMimeType: 'application/json',
@@ -453,8 +480,7 @@ Return ONLY valid JSON matching this schema:
 
     contentsParts.push({ text: rawText ? `Strip Text Content:\n${rawText}\n\n${promptText}` : promptText });
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
+    const response = await this.generateWithModelFallback({
       contents: { parts: contentsParts },
       config: {
         responseMimeType: 'application/json',
@@ -587,8 +613,7 @@ Return ONLY valid JSON matching this schema:
 
     contentsParts.push({ text: rawText ? `Barcode Image Content:\n${rawText}\n\n${promptText}` : promptText });
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
+    const response = await this.generateWithModelFallback({
       contents: { parts: contentsParts },
       config: {
         responseMimeType: 'application/json',
@@ -656,8 +681,7 @@ Return JSON format:
   "reasoning": string
 }`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
+    const response = await this.generateWithModelFallback({
       contents: prompt,
       config: {
         responseMimeType: 'application/json'
@@ -698,8 +722,7 @@ Provide executive AI Insights & Demand Predictions for the pharmacy manager in J
   "revenueGrowthAdvice": string
 }`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
+    const response = await this.generateWithModelFallback({
       contents: prompt,
       config: {
         responseMimeType: 'application/json'
